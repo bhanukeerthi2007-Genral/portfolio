@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bhanukeerthi vinod | Sticky Notes & Mountain Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            handwriting: ['Caveat', 'cursive'],
+          },
+          animation: {
+            'float-slow': 'float 8s ease-in-out infinite',
+            'float-delayed': 'float 10s ease-in-out 3s infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-10px) rotate(1.5deg)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #06111f;
+      color: #1a2e22;
+      font-family: 'Inter', sans-serif;
+    }
+    .mountain-bg {
+      background: 
+        radial-gradient(circle at 50% 12%, rgba(28, 68, 120, 0.45) 0%, transparent 50%),
+        radial-gradient(circle at 85% 35%, rgba(18, 52, 98, 0.4) 0%, transparent 45%),
+        radial-gradient(circle at 15% 75%, rgba(14, 38, 75, 0.35) 0%, transparent 50%),
+        linear-gradient(180deg, #040c17 0%, #08172c 25%, #0d2242 60%, #050f1d 100%);
+      background-attachment: fixed;
+    }
+    .sticky-card {
+      box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.12),
+        0 12px 28px -4px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .sticky-card:hover {
+      box-shadow: 
+        0 6px 14px rgba(0, 0, 0, 0.18),
+        0 24px 48px -6px rgba(0, 0, 0, 0.5);
+      transform: translateY(-6px) scale(1.015) rotate(0deg) !important;
+      z-index: 25;
+    }
+    .pin-head {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.45), inset 0 2px 2px rgba(255,255,255,0.7);
+      position: relative;
+    }
+    .pin-head::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+    }
+    .washi-tape {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(2px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      border-left: 2px dashed rgba(200, 200, 200, 0.5);
+      border-right: 2px dashed rgba(200, 200, 200, 0.5);
+    }
+    .paper-clip {
+      width: 14px;
+      height: 36px;
+      border: 3px solid #718096;
+      border-radius: 12px;
+      position: absolute;
+      box-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+    }
+    /* Snake canvas grid styling */
+    .snake-grid {
+      background-image: 
+        linear-gradient(rgba(21, 128, 61, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(21, 128, 61, 0.15) 1px, transparent 1px);
+      background-size: 6.25% 6.25%;
+    }
+  </style>
+</head>
+<body class="mountain-bg min-h-screen relative text-gray-900 selection:bg-amber-300 selection:text-amber-950 pb-20">
+
+  <!-- INTERACTIVE NATURE & STARDUST CURSOR -->
+  <canvas id="cursor-sparkles-canvas" class="pointer-events-none fixed inset-0 z-50 overflow-hidden"></canvas>
+  <div id="cursor-ring" class="pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-all duration-200 ease-out flex items-center justify-center opacity-0 w-9 h-9 border border-sky-400/60 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.35)]" style="will-change: transform;"></div>
+  <div id="cursor-dot" class="pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-opacity duration-150 opacity-0 w-2 h-2 bg-sky-400 shadow-[0_0_6px_#38bdf8]" style="will-change: transform;"></div>
+
+  <!-- CINEMA MODE RETURN BANNER -->
+  <div id="cinema-banner" onclick="toggleCinemaMode()" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-black/85 backdrop-blur-md border border-amber-400 text-amber-300 text-xs sm:text-sm font-mono shadow-2xl cursor-pointer hover:bg-black/95 transition-all items-center gap-2 animate-bounce">
+    <span>🎥 Cinema Mode Active (Watching Live Wildlife & Waves)</span>
+    <span class="text-[10px] bg-amber-400 text-black px-2 py-0.5 rounded-full font-bold">Click to Restore Notes</span>
+  </div>
+
+  <!-- LIVE NATURE MEDIA & MOVABLE BACKGROUND LAYER (Z-INDEX 0) -->
+  <div id="nature-bg-root" class="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none">
+    <!-- Live YouTube Video Feed Stream (Optional switchable) -->
+    <div id="nature-video-wrapper" class="hidden absolute inset-0 w-full h-full overflow-hidden">
+      <iframe
+        id="nature-live-iframe"
+        class="absolute top-1/2 left-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.77vh] -translate-x-1/2 -translate-y-1/2 pointer-events-none border-0 transition-opacity duration-1000"
+        src=""
+        title="Live Wildlife Stream"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
+      </iframe>
+    </div>
+
+    <!-- Movable Interactive Ocean Waves Canvas -->
+    <canvas id="ocean-waves-canvas" class="hidden absolute inset-0 w-full h-full pointer-events-none opacity-85 transition-opacity duration-700"></canvas>
+
+    <!-- Bluish Mountain Summits SVG (Default Mountain Mode) -->
+    <div id="mountain-svg-layer" class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-[8%] left-1/2 -translate-x-1/2 w-[650px] h-[380px] bg-sky-500/15 rounded-full blur-3xl"></div>
+      <div class="absolute top-[16%] right-[12%] w-[450px] h-[320px] bg-blue-600/15 rounded-full blur-3xl"></div>
+
+      <!-- Distant High Summits -->
+      <svg class="absolute bottom-[22%] sm:bottom-[18%] left-0 w-full h-[320px] sm:h-[460px] text-[#0b1c36]/60" viewBox="0 0 1440 400" fill="currentColor" preserveAspectRatio="none">
+        <path d="M0,280 L180,140 L340,250 L520,90 L720,240 L900,110 L1080,260 L1260,130 L1440,270 L1440,400 L0,400 Z" />
+      </svg>
+
+      <!-- Midground Craggy Alpine Ridges -->
+      <svg class="absolute bottom-[10%] sm:bottom-[8%] left-0 w-full h-[280px] sm:h-[390px] text-[#0f274a]/85" viewBox="0 0 1440 350" fill="currentColor" preserveAspectRatio="none">
+        <path d="M0,220 L140,110 L280,210 L440,80 L620,230 L800,100 L980,220 L1160,90 L1320,200 L1440,130 L1440,350 L0,350 Z" />
+      </svg>
+
+      <!-- Snow caps -->
+      <svg class="absolute bottom-[10%] sm:bottom-[8%] left-0 w-full h-[280px] sm:h-[390px] text-sky-200/20" viewBox="0 0 1440 350" fill="currentColor" preserveAspectRatio="none">
+        <polygon points="440,80 415,125 465,125" />
+        <polygon points="800,100 775,140 825,140" />
+        <polygon points="1160,90 1135,135 1185,135" />
+        <polygon points="140,110 115,145 165,145" />
+      </svg>
+
+      <!-- Valley Mist -->
+      <div class="absolute bottom-[13%] left-0 right-0 h-32 bg-gradient-to-t from-[#091a33]/90 via-[#0a2040]/50 to-transparent"></div>
+
+      <!-- Foreground Pine Forest -->
+      <svg class="absolute bottom-0 left-0 w-full h-[150px] sm:h-[210px] text-[#030914]" viewBox="0 0 1440 200" fill="currentColor" preserveAspectRatio="none">
+        <path d="M0,130 L30,90 L60,130 L90,80 L120,130 L150,95 L180,135 L210,75 L240,130 L270,90 L300,135 L330,70 L360,130 L390,85 L420,135 L450,80 L480,130 L510,90 L540,135 L570,75 L600,130 L630,85 L660,135 L690,70 L720,130 L750,90 L780,135 L810,80 L840,130 L870,95 L900,135 L930,75 L960,130 L990,85 L1020,135 L1050,70 L1080,130 L1110,90 L1140,135 L1170,80 L1200,130 L1230,95 L1260,135 L1290,75 L1320,130 L1350,85 L1380,135 L1410,70 L1440,120 L1440,200 L0,200 Z" />
+      </svg>
+    </div>
+
+    <!-- Ambient Vignette Contrast Overlay (Drops in cinema mode so wildlife shines through) -->
+    <div id="nature-vignette" class="absolute inset-0 bg-gradient-to-b from-[#030914]/85 via-[#061830]/75 to-[#040e1f]/90 transition-opacity duration-700 pointer-events-none"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-52 bg-sky-500/10 blur-3xl pointer-events-none"></div>
+  </div>
+
+  <!-- FLOATING FIREFLIES -->
+  <div id="fireflies-container" class="fixed inset-0 pointer-events-none z-1 overflow-hidden"></div>
+
+  <!-- 1. NAVBAR -->
+  <header class="sticky top-4 z-40 max-w-5xl mx-auto px-4 pt-4">
+    <nav class="bg-[#0c1e38]/90 backdrop-blur-md border border-blue-800/50 rounded-full px-5 py-2.5 shadow-2xl flex items-center justify-between">
+      <a href="#hero" class="flex items-center gap-2 group transition-transform hover:scale-105">
+        <span class="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 text-sm font-bold shadow-inner">
+          🏔️
+        </span>
+        <span class="font-bold text-sky-100 tracking-wide text-sm sm:text-base font-mono">
+          Bhanukeerthi vinod
+        </span>
+      </a>
+
+      <div class="flex items-center gap-1.5 sm:gap-3 text-xs sm:text-sm font-medium">
+        <a href="#about" class="px-2 py-1 text-sky-200/90 hover:text-white rounded-md transition-colors hover:-translate-y-0.5">About</a>
+        <a href="#projects" class="px-2 py-1 text-sky-200/90 hover:text-white rounded-md transition-colors hover:-translate-y-0.5">Projects</a>
+        <a href="#arcade" class="hidden sm:inline-block px-2 py-1 text-amber-300 hover:text-amber-200 rounded-md transition-colors font-mono">🕹️ Snake</a>
+        <a href="#community-board" class="hidden md:inline-block px-2 py-1 text-emerald-300 hover:text-emerald-200 rounded-md transition-colors font-mono">💬 Board</a>
+        <a href="#contact" class="bg-[#FEF08A] text-amber-950 font-bold px-3 py-1 rounded-full shadow-sm hover:bg-[#FDE047] hover:scale-105 transition-all flex items-center gap-1">
+          <span>📬</span> Contact
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="relative z-10 max-w-6xl mx-auto px-4 mt-6 space-y-20">
+
+    <!-- 2. HERO -->
+    <section id="hero" class="pt-10 sm:pt-16 pb-6 flex flex-col items-center justify-center text-center">
+      <div class="mb-6 -rotate-2 hover:rotate-0 transition-transform">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0e2444]/90 text-sky-300 border border-blue-500/30 text-xs sm:text-sm font-medium shadow-lg">
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping inline-block"></span>
+          🌱 Open for collaborative projects & internships
+        </span>
+      </div>
+
+      <div class="w-full max-w-3xl">
+        <div class="sticky-card relative rounded-sm p-8 sm:p-12 bg-[#FFF9C4] border border-[#FBC02D]/40 text-center -rotate-1">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+            <div class="pin-head bg-red-600"></div>
+          </div>
+
+          <div class="space-y-4">
+            <span class="text-amber-800 text-xl sm:text-2xl font-bold font-handwriting block">
+              👋 Hello World, I am
+            </span>
+
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-gray-900 tracking-tight">
+              Bhanukeerthi vinod
+            </h1>
+
+            <div class="inline-block px-3 py-1 bg-amber-200/60 rounded-md text-amber-900 font-semibold text-xs sm:text-sm tracking-wider uppercase">
+              1st-Year CS @ BIT Bengaluru &bull; Embedded IoT &amp; AI Full-Stack
+            </div>
+
+            <p class="text-base sm:text-xl text-gray-700 max-w-xl mx-auto font-medium leading-relaxed pt-2">
+              &ldquo;1st-year CS student at Bangalore Institute of Technology passionate about AI, embedded hardware, robotics &amp; full-stack development.&rdquo;
+            </p>
+
+            <div class="pt-6 flex flex-wrap items-center justify-center gap-4">
+              <a href="#projects" class="inline-flex items-center gap-2 bg-[#1a3d6b] hover:bg-[#132f54] text-sky-50 font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all text-sm sm:text-base">
+                <span class="w-2 h-2 rounded-full bg-sky-300"></span>
+                View my work
+              </a>
+
+              <a href="#contact" class="inline-flex items-center gap-2 bg-[#FFEDD5] hover:bg-[#FED7AA] text-orange-950 font-semibold px-6 py-3 rounded-lg border border-orange-300 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all text-sm sm:text-base">
+                <span>📬</span>
+                Contact me
+              </a>
+            </div>
+
+            <!-- Quick Profile Chips -->
+            <div class="pt-2 flex items-center justify-center gap-3 text-xs">
+              <a href="https://github.com/bhanukeerthi2007-Genral" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/70 hover:bg-white text-gray-900 border border-black/10 shadow-xs hover:scale-105 transition-all font-mono font-medium">
+                <span>💻</span> GitHub
+              </a>
+              <a href="https://www.linkedin.com/in/bhanukeerthi-vinod-8384652b3/" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/70 hover:bg-white text-sky-900 border border-black/10 shadow-xs hover:scale-105 transition-all font-mono font-medium">
+                <span>💼</span> LinkedIn
+              </a>
+              <a href="#arcade" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 shadow-xs hover:scale-105 transition-all font-mono font-medium">
+                <span>🕹️</span> Play Snake
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ABOUT -->
+    <section id="about" class="py-6 max-w-5xl mx-auto">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold text-sky-100 font-handwriting flex items-center justify-center gap-2">
+          <span>🌿</span> About Me
+        </h2>
+        <p class="text-sky-200/80 text-sm max-w-md mx-auto mt-1">
+          A little about my background, technical toolbox, and what drives me.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-10">
+        <div class="md:col-span-5 flex justify-center">
+          <div class="relative -rotate-2 hover:rotate-0 transition-transform duration-300">
+            <div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 h-7 w-28 -rotate-2 z-20"></div>
+            <div class="bg-white p-4 pb-6 rounded shadow-2xl border border-gray-200 max-w-xs">
+              <div class="overflow-hidden rounded-sm bg-blue-950 aspect-[4/5]">
+                <img src="profile.jpg" alt="Bhanukeerthi vinod" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+              </div>
+              <div class="mt-4 text-center">
+                <p class="text-gray-800 text-xl font-bold font-handwriting">Bhanukeerthi vinod ✨</p>
+                <p class="text-xs text-gray-500 font-mono mt-0.5">📍 Bengaluru, Karnataka, India</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-7 space-y-6">
+          <div class="sticky-card relative rounded-sm p-6 bg-[#DCFCE7] border border-[#86EFAC]/60 rotate-1">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-emerald-600"></div></div>
+            <h3 class="font-bold text-2xl text-[#166534] font-handwriting mb-2">Bio &amp; Background</h3>
+            <p class="text-gray-800 text-base leading-relaxed mb-4">
+              I am a first-year Computer Science Engineering student at <strong>Bangalore Institute of Technology (BIT)</strong>, Bengaluru. I previously graduated from <strong>Sri Kumaran Children's Home Composite PU College</strong> in PCMCs. My passions sit at the intersection of embedded IoT hardware (Arduino, ESP32, Raspberry Pi), robotics, mathematics, and building intelligent AI-driven full-stack web systems.
+            </p>
+
+            <div class="pt-3 border-t border-emerald-800/10">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-900 mb-2">Technical Skills &amp; Tools</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Arduino</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#ESP32</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Raspberry Pi</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#C++ (DSA)</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Python (AI &amp; ML)</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Linux</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Git &amp; GitHub</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Full-Stack Web</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#Robotics</span>
+                <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-sm hover:scale-105 transition-all">#IoT Telemetry</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sticky-card relative rounded-sm p-5 bg-[#FFF9C4] border border-[#FBC02D]/40 -rotate-1">
+            <div class="washi-tape absolute -top-3.5 left-1/2 -translate-x-1/2 h-6 w-24"></div>
+            <h3 class="font-bold text-xl text-[#78540B] font-handwriting mb-3">Skill Proficiency</h3>
+            <div class="space-y-2.5 text-xs">
+              <div>
+                <div class="flex justify-between font-semibold text-gray-800 mb-1">
+                  <span>Embedded Systems (Arduino, ESP32, RPi)</span><span>88% (Advanced)</span>
+                </div>
+                <div class="w-full bg-black/10 rounded-full h-2"><div class="h-full bg-gray-800 rounded-full" style="width: 88%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold text-gray-800 mb-1">
+                  <span>Full-Stack Web (React, Next.js, JS, Tailwind)</span><span>86% (Proficient)</span>
+                </div>
+                <div class="w-full bg-black/10 rounded-full h-2"><div class="h-full bg-gray-800 rounded-full" style="width: 86%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold text-gray-800 mb-1">
+                  <span>C++ &amp; Data Structures (DSA)</span><span>82% (Active)</span>
+                </div>
+                <div class="w-full bg-black/10 rounded-full h-2"><div class="h-full bg-gray-800 rounded-full" style="width: 82%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between font-semibold text-gray-800 mb-1">
+                  <span>Linux Administration &amp; Git/GitHub</span><span>80% (Proficient)</span>
+                </div>
+                <div class="w-full bg-black/10 rounded-full h-2"><div class="h-full bg-gray-800 rounded-full" style="width: 80%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="sticky-card relative rounded-sm p-5 bg-[#FFE4E6] border border-[#FDA4AF]/60 -rotate-1">
+          <div class="paper-clip -top-4 right-6"></div>
+          <h3 class="font-bold text-xl text-[#9F1239] font-handwriting mb-2">Currently Learning</h3>
+          <div class="space-y-2 text-xs text-gray-700">
+            <div class="p-2 bg-white/60 rounded border border-pink-200">
+              <span class="font-bold text-pink-900">Data Structures &amp; Algorithms in C++:</span> Graph algorithms, dynamic programming, and complexity optimization for technical mastery.
+            </div>
+            <div class="p-2 bg-white/60 rounded border border-pink-200">
+              <span class="font-bold text-pink-900">Python for AI &amp; Machine Learning:</span> Neural networks, computer vision, and applied ML pipelines for intelligent edge devices.
+            </div>
+            <div class="p-2 bg-white/60 rounded border border-pink-200">
+              <span class="font-bold text-pink-900">Linux &amp; Git Automation:</span> Terminal power workflows, bash scripting, and collaborative repository architecture.
+            </div>
+          </div>
+        </div>
+
+        <div class="sticky-card relative rounded-sm p-5 bg-[#E0F2FE] border border-[#7DD3FC]/60 rotate-1">
+          <div class="paper-clip -top-4 right-6"></div>
+          <h3 class="font-bold text-xl text-[#0369A1] font-handwriting mb-2">Where I Studied (Timeline)</h3>
+          <div class="space-y-2 text-xs text-gray-700">
+            <div class="p-2 bg-white/60 rounded border border-sky-200">
+              <div class="flex justify-between items-center mb-0.5">
+                <p class="font-bold text-sky-950">Bangalore Institute of Technology (BIT)</p>
+                <span class="text-[10px] bg-sky-200 px-1.5 py-0.5 rounded font-bold text-sky-900">2024 - Present</span>
+              </div>
+              <p class="text-[11px] text-gray-700">B.E. in Computer Science &amp; Engineering &bull; 1st Year student exploring DSA in C++, full-stack web, and embedded systems.</p>
+            </div>
+            <div class="p-2 bg-white/60 rounded border border-sky-200">
+              <div class="flex justify-between items-center mb-0.5">
+                <p class="font-bold text-sky-950">Sri Kumaran Children's Home Composite PU College</p>
+                <span class="text-[10px] bg-sky-200 px-1.5 py-0.5 rounded font-bold text-sky-900">2022 - 2024</span>
+              </div>
+              <p class="text-[11px] text-gray-700">Pre-University Course (PUC) &bull; Completed PCMCs (Physics, Chemistry, Mathematics, Computer Science) with distinction.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. PROJECTS -->
+    <section id="projects" class="py-6 max-w-6xl mx-auto">
+      <div class="text-center mb-10">
+        <span class="px-3 py-1 rounded-full bg-blue-900/80 text-sky-300 border border-blue-700/50 text-xs font-mono">
+          ⚡ Real-Time Crafts & Prototypes
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-bold text-sky-100 font-handwriting flex items-center justify-center gap-3 mt-2">
+          <span>📌</span> Featured Projects
+        </h2>
+        <p class="text-sky-200/80 text-sm max-w-xl mx-auto mt-2">
+          One card per project with name, description, tech-stack tags and a "View on GitHub" link.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <!-- Project 1 Card: EdgeGuardian CCTV -->
+        <div class="sticky-card relative rounded-sm p-6 bg-[#FFF9C4] border border-[#FBC02D]/40 -rotate-1 flex flex-col justify-between">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-red-600"></div></div>
+          <div>
+            <h3 class="font-bold text-xl text-[#78540B] font-handwriting mb-1">EdgeGuardian: Air-Gapped Remote CCTV</h3>
+            <div class="mb-3 inline-flex items-center gap-1.5 bg-black/10 px-2.5 py-1 rounded-md text-xs font-bold text-gray-900">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span>🛡️ Local RTSP &amp; Motion Detection</span>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-800 leading-relaxed mb-4">
+              An offline edge-computing surveillance camera designed to stream and record video without requiring active external internet or cloud subscriptions. Built with an ESP32-CAM / Raspberry Pi unit featuring local Wi-Fi AP streaming, circular SD storage, and motion triggers.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mb-5 text-xs font-mono">
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#Raspberry Pi</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#ESP32-CAM</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#Python</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#OpenCV</span>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-black/10 flex items-center justify-between text-xs">
+            <a href="https://github.com/bhanukeerthi2007-Genral" target="_blank" class="font-semibold text-gray-900 hover:text-black underline">💻 View on GitHub &rarr;</a>
+            <span class="text-[11px] font-mono text-gray-600">Air-Gapped IoT</span>
+          </div>
+        </div>
+
+        <!-- Project 2 Card: MacroDeck HID -->
+        <div class="sticky-card relative rounded-sm p-6 bg-[#E0F2FE] border border-[#7DD3FC]/60 rotate-1 flex flex-col justify-between">
+          <div class="washi-tape absolute -top-3 left-1/2 -translate-x-1/2 h-6 w-24 rotate-1 z-10"></div>
+          <div>
+            <h3 class="font-bold text-xl text-[#0369A1] font-handwriting mb-1">MacroDeck HID: ESP32 Mechanical Keypad</h3>
+            <div class="mb-3 inline-flex items-center gap-1.5 bg-black/10 px-2.5 py-1 rounded-md text-xs font-bold text-gray-900">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span>⚡ Sub-5ms HID Keystroke Response</span>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-800 leading-relaxed mb-4">
+              A custom programmable mechanical productivity keypad powered by an ESP32 running custom C++ firmware. Acts as a native USB and Bluetooth Human Interface Device (HID) for developer shortcut macros, media controls, and multi-layer key bindings.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mb-5 text-xs font-mono">
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#ESP32</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#C++</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#Arduino</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#HID</span>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-black/10 flex items-center justify-between text-xs">
+            <a href="https://github.com/bhanukeerthi2007-Genral" target="_blank" class="font-semibold text-gray-900 hover:text-black underline">💻 View on GitHub &rarr;</a>
+            <span class="text-[11px] font-mono text-gray-600">Hardware Macro</span>
+          </div>
+        </div>
+
+        <!-- Project 3 Card: ClassSync Timetable -->
+        <div class="sticky-card relative rounded-sm p-6 bg-[#DCFCE7] border border-[#86EFAC]/60 -rotate-1 flex flex-col justify-between">
+          <div class="paper-clip -top-4 right-6"></div>
+          <div>
+            <h3 class="font-bold text-xl text-[#166534] font-handwriting mb-1">ClassSync: Dynamic Classroom Portal</h3>
+            <div class="mb-3 inline-flex items-center gap-1.5 bg-black/10 px-2.5 py-1 rounded-md text-xs font-bold text-gray-900">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span>⏱️ Real-Time Schedule Linking</span>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-800 leading-relaxed mb-4">
+              Created during lockdown: A smart automated timetable web application that directly linked students and teachers to their live virtual classes (Google Meet/Zoom) with zero link confusion, real-time schedule countdowns, and automated period status.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mb-5 text-xs font-mono">
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#JavaScript</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#HTML5</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#CSS3</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#Web APIs</span>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-black/10 flex items-center justify-between text-xs">
+            <a href="https://github.com/bhanukeerthi2007-Genral" target="_blank" class="font-semibold text-gray-900 hover:text-black underline">💻 View on GitHub &rarr;</a>
+            <span class="text-[11px] font-mono text-gray-600">Lockdown Web App</span>
+          </div>
+        </div>
+
+        <!-- Project 4 Card: HelioSense Solar -->
+        <div class="sticky-card relative rounded-sm p-6 bg-[#F3E8FF] border border-[#D8B4FE]/60 rotate-1 flex flex-col justify-between">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-amber-600"></div></div>
+          <div>
+            <h3 class="font-bold text-xl text-[#6B21A8] font-handwriting mb-1">HelioSense: Smart Solar PV Telemetry</h3>
+            <div class="mb-3 inline-flex items-center gap-1.5 bg-black/10 px-2.5 py-1 rounded-md text-xs font-bold text-gray-900">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span>☀️ Live PV Solar Yield Monitoring</span>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-800 leading-relaxed mb-4">
+              An intelligent solar energy telemetry and monitoring station tracking real-time photovoltaic output, panel voltage, current generation, and battery charge states using embedded sensor microcontrollers to evaluate clean energy efficiency.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mb-5 text-xs font-mono">
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#Arduino</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#ESP32</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#Sensors</span>
+              <span class="px-2 py-0.5 bg-white/70 rounded border border-black/10">#C++</span>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-black/10 flex items-center justify-between text-xs">
+            <a href="https://github.com/bhanukeerthi2007-Genral" target="_blank" class="font-semibold text-gray-900 hover:text-black underline">💻 View on GitHub &rarr;</a>
+            <span class="text-[11px] font-mono text-gray-600">Green CleanTech</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUN ZONE 1: 🕹️ MULTI-GAME ARCADE & LEADERBOARD -->
+    <section id="arcade" class="py-6 max-w-4xl mx-auto">
+      <div class="text-center mb-8">
+        <span class="px-3.5 py-1 rounded-full bg-blue-900/80 text-sky-300 border border-blue-700/50 text-xs font-mono inline-flex items-center gap-1.5">
+          <span>🕹️</span> Bhanu's Alpine Arcade &amp; Hall of Fame
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-bold text-sky-100 font-handwriting flex items-center justify-center gap-3 mt-2">
+          <span>⛰️</span> Study Break Games
+        </h2>
+        <p class="text-sky-200/80 text-sm max-w-md mx-auto mt-1">
+          Take a quick break between projects! Challenge your reflexes on the live leaderboard.
+        </p>
+
+        <!-- Arcade Mode Tabs -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mt-5 font-mono text-xs">
+          <button
+            type="button"
+            id="tab-btn-snake"
+            onclick="switchArcadeView('snake')"
+            class="px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-emerald-600 text-white border-emerald-400 shadow-lg scale-105"
+          >
+            <span>🐍</span> Alpine Snake
+          </button>
+
+          <button
+            type="button"
+            id="tab-btn-brick"
+            onclick="switchArcadeView('brick')"
+            class="px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200 border-blue-800/40"
+          >
+            <span>🧱</span> Brick Breaker
+          </button>
+
+          <button
+            type="button"
+            id="tab-btn-leaderboard"
+            onclick="switchArcadeView('leaderboard')"
+            class="px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-amber-300 border-amber-500/40"
+          >
+            <span>🏆</span> Leaderboard <span id="leaderboard-count-badge" class="ml-0.5 px-1.5 py-0.2 bg-amber-400/20 rounded-full text-[10px]">(3)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-center">
+        <div class="w-full max-w-md">
+          <div class="sticky-card relative rounded-sm p-5 sm:p-6 bg-[#DCFCE7] border border-[#86EFAC]/70 shadow-2xl -rotate-1">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-sky-600"></div></div>
+
+            <!-- VIEW 1: SNAKE GAME -->
+            <div id="arcade-snake-view">
+              <div class="flex items-center justify-between gap-2 border-b border-black/10 pb-2 mb-3">
+                <div class="flex items-center gap-2 text-xs font-mono">
+                  <div class="bg-white/80 px-2 py-0.5 rounded border border-black/10 font-bold text-gray-800">
+                    SCORE: <span id="snake-score" class="text-emerald-700 font-extrabold">0</span>
+                  </div>
+                  <div class="bg-white/80 px-2 py-0.5 rounded border border-black/10 font-bold text-gray-800">
+                    HIGH: <span id="snake-high" class="text-amber-700 font-extrabold">0</span>
+                  </div>
+                </div>
+                <button id="sound-btn" onclick="toggleSnakeSound()" class="px-2 py-0.5 rounded bg-white/70 hover:bg-white text-xs border border-black/10 font-mono transition-colors">
+                  🔊 Sound On
+                </button>
+              </div>
+
+              <!-- Snake Canvas -->
+              <div class="relative aspect-square w-full max-w-sm mx-auto bg-[#eef8ed] rounded-lg border-2 border-emerald-900/30 shadow-inner overflow-hidden snake-grid">
+                <canvas id="snake-canvas" width="320" height="320" class="w-full h-full block"></canvas>
+
+                <div id="snake-overlay" class="absolute inset-0 bg-emerald-950/80 flex flex-col items-center justify-center p-4 text-center text-white">
+                  <p id="snake-msg-title" class="text-3xl font-bold font-handwriting text-amber-200 mb-1">
+                    🏔️ Ready for the Trail?
+                  </p>
+                  <p id="snake-msg-sub" class="text-xs text-emerald-200 max-w-[200px] mb-4">
+                    Use Arrow keys or W/A/S/D to gather pine treats!
+                  </p>
+                  <button onclick="startSnakeGame()" class="px-6 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-bold text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all">
+                    ▶ Start Game
+                  </button>
+                </div>
+              </div>
+
+              <!-- Snake Mobile Controls -->
+              <div class="mt-3 flex flex-col items-center gap-1 sm:hidden">
+                <button onclick="setSnakeDir('UP')" class="w-12 h-9 rounded bg-emerald-800 text-white font-bold flex items-center justify-center shadow-md active:scale-95">▲</button>
+                <div class="flex gap-4">
+                  <button onclick="setSnakeDir('LEFT')" class="w-12 h-9 rounded bg-emerald-800 text-white font-bold flex items-center justify-center shadow-md active:scale-95">◀</button>
+                  <button onclick="setSnakeDir('DOWN')" class="w-12 h-9 rounded bg-emerald-800 text-white font-bold flex items-center justify-center shadow-md active:scale-95">▼</button>
+                  <button onclick="setSnakeDir('RIGHT')" class="w-12 h-9 rounded bg-emerald-800 text-white font-bold flex items-center justify-center shadow-md active:scale-95">▶</button>
+                </div>
+              </div>
+
+              <div class="mt-3 pt-2 border-t border-black/10 flex items-center justify-between text-xs text-gray-700">
+                <span class="font-semibold">Trail Pace:</span>
+                <div class="flex gap-1.5 font-mono text-[11px]">
+                  <button onclick="setSnakeSpeed(150, this)" class="speed-btn px-2 py-0.5 rounded bg-white hover:bg-white text-gray-800">Gentle</button>
+                  <button onclick="setSnakeSpeed(110, this)" class="speed-btn px-2 py-0.5 rounded bg-emerald-800 text-white font-bold">Alpine</button>
+                  <button onclick="setSnakeSpeed(80, this)" class="speed-btn px-2 py-0.5 rounded bg-white hover:bg-white text-gray-800">Rush</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW 2: BRICK BREAKER GAME -->
+            <div id="arcade-brick-view" class="hidden">
+              <div class="flex items-center justify-between gap-2 border-b border-black/10 pb-2 mb-3">
+                <div class="flex items-center gap-3 text-xs font-mono">
+                  <div class="bg-white/80 px-2 py-0.5 rounded border border-black/10 font-bold text-gray-800">
+                    SCORE: <span id="brick-score" class="text-sky-700 font-extrabold">0</span>
+                  </div>
+                  <div class="bg-white/80 px-2 py-0.5 rounded border border-black/10 font-bold text-rose-600">
+                    LIVES: <span id="brick-lives">❤️❤️❤️</span>
+                  </div>
+                </div>
+                <button onclick="toggleSnakeSound()" class="px-2 py-0.5 rounded bg-white/70 hover:bg-white text-xs border border-black/10 font-mono transition-colors">
+                  🔊 Sound
+                </button>
+              </div>
+
+              <!-- Brick Breaker Canvas -->
+              <div class="relative aspect-square w-full max-w-sm mx-auto bg-[#0f172a] rounded-lg border-2 border-sky-900/40 shadow-inner overflow-hidden cursor-ew-resize">
+                <canvas id="brick-canvas" width="320" height="320" class="w-full h-full block"></canvas>
+
+                <div id="brick-overlay" class="absolute inset-0 bg-slate-950/85 flex flex-col items-center justify-center p-4 text-center text-white">
+                  <p id="brick-msg-title" class="text-2xl font-bold font-handwriting text-sky-200 mb-1">
+                    🧱 Mountain Brick Breaker
+                  </p>
+                  <p id="brick-msg-sub" class="text-xs text-sky-300 max-w-[210px] mb-4">
+                    Move mouse or swipe finger across the board to slide paddle!
+                  </p>
+                  <button onclick="startBrickGame()" class="px-6 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 font-bold text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all">
+                    ▶ Start Smash
+                  </button>
+                </div>
+              </div>
+
+              <p class="text-center text-[11px] text-gray-700 mt-2 font-mono">
+                💡 Slide mouse or finger over canvas to guide the paddle!
+              </p>
+            </div>
+
+            <!-- VIEW 3: LIVE LEADERBOARD -->
+            <div id="arcade-leaderboard-view" class="hidden">
+              <div class="flex items-center justify-between border-b border-black/10 pb-2 mb-3">
+                <span class="text-xs font-bold text-gray-800 uppercase font-mono">
+                  🏆 Top Scores &bull; Hall of Fame
+                </span>
+                <button onclick="clearLeaderboardRecords()" class="text-[11px] font-mono text-rose-600 hover:text-rose-800 underline font-semibold transition-colors">
+                  🗑️ Reset Leaderboard
+                </button>
+              </div>
+
+              <div id="leaderboard-list" class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+                <!-- Dynamically populated from JS -->
+              </div>
+
+              <div class="pt-3 border-t border-black/10 flex justify-center mt-3">
+                <button onclick="switchArcadeView('snake')" class="px-4 py-1.5 rounded-lg bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider transition-all">
+                  Back to Games
+                </button>
+              </div>
+            </div>
+
+            <!-- SCORE SUBMISSION POPUP -->
+            <div id="score-submit-card" class="hidden mt-3 p-3 bg-amber-100 rounded-lg border-2 border-amber-300 shadow-md">
+              <div class="flex items-center justify-between mb-1.5">
+                <span id="score-submit-title" class="text-xs font-bold text-amber-950 font-mono">
+                  🌟 New High Run!
+                </span>
+                <button onclick="document.getElementById('score-submit-card').classList.add('hidden')" class="text-gray-500 hover:text-gray-800 text-xs">
+                  ✕
+                </button>
+              </div>
+              <form onsubmit="submitPlayerScore(event)" class="flex gap-2">
+                <input id="player-name-input" type="text" required placeholder="Enter your name / handle" class="flex-1 bg-white border border-amber-400 rounded px-2.5 py-1 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-600 font-mono">
+                <button type="submit" class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs font-mono shadow-xs transition-colors">
+                  📌 Save Score
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUN ZONE 2: 💬 INTERACTIVE COMMUNITY STICKY BOARD -->
+    <section id="community-board" class="py-6 max-w-6xl mx-auto">
+      <div class="text-center mb-10">
+        <span class="px-3.5 py-1 rounded-full bg-blue-900/80 text-sky-300 border border-blue-700/50 text-xs font-mono inline-flex items-center gap-1.5">
+          <span>📌</span> Interactive Corkboard
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-bold text-sky-100 font-handwriting flex items-center justify-center gap-3 mt-2">
+          <span>💬</span> Pin Your Own Note on My Board!
+        </h2>
+        <p class="text-sky-200/80 text-sm max-w-lg mx-auto mt-1">
+          Leave a message, feedback, or say hi! Pick your sticky paper, pin style, and post it to the community wall.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Add Note Form -->
+        <div class="lg:col-span-5">
+          <div id="new-note-card" class="sticky-card relative rounded-sm p-6 bg-[#FFF9C4] border border-[#FBC02D]/40 shadow-2xl -rotate-1">
+            <div id="new-note-pin" class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-red-600"></div></div>
+            <h3 class="font-bold text-2xl text-[#78540B] font-handwriting mb-3">Write a New Sticky Note</h3>
+
+            <form onsubmit="handlePostUserNote(event)" class="space-y-3.5">
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-700 mb-1.5">1. Pick Note Paper:</label>
+                <div class="flex gap-2">
+                  <button type="button" onclick="selectBoardColor('yellow', '#FFF9C4', '#FBC02D')" class="w-6 h-6 rounded-full bg-[#FEF08A] border ring-2 ring-blue-700"></button>
+                  <button type="button" onclick="selectBoardColor('green', '#DCFCE7', '#86EFAC')" class="w-6 h-6 rounded-full bg-[#BBF7D0] border"></button>
+                  <button type="button" onclick="selectBoardColor('pink', '#FFE4E6', '#FDA4AF')" class="w-6 h-6 rounded-full bg-[#FECDD3] border"></button>
+                  <button type="button" onclick="selectBoardColor('blue', '#E0F2FE', '#7DD3FC')" class="w-6 h-6 rounded-full bg-[#BAE6FD] border"></button>
+                  <button type="button" onclick="selectBoardColor('purple', '#F3E8FF', '#D8B4FE')" class="w-6 h-6 rounded-full bg-[#E9D5FF] border"></button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Your Name / Handle:</label>
+                <input id="board-author" type="text" required placeholder="e.g. Maya / @frontend_dev" class="w-full bg-white/75 border border-black/15 rounded px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-700">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Your Note:</label>
+                <textarea id="board-msg" required rows="3" placeholder="Leave words of encouragement, project ideas, or questions..." class="w-full bg-white/75 border border-black/15 rounded px-3 py-1.5 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-700 resize-none"></textarea>
+              </div>
+
+              <div id="board-success" class="hidden p-2 rounded bg-emerald-800 text-emerald-100 text-xs font-medium text-center">
+                🎉 Your sticky note has been posted to the board!
+              </div>
+
+              <button type="submit" class="w-full py-2.5 rounded-lg bg-[#1a3d6b] hover:bg-[#132f54] text-sky-50 font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5">
+                <span>📌</span> Stick It on the Board!
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Live Community Board Grid -->
+        <div class="lg:col-span-7">
+          <div id="community-notes-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Empty State Note -->
+            <div id="board-empty-state" class="col-span-full flex justify-center py-6">
+              <div class="sticky-card relative rounded-sm p-8 text-center max-w-md w-full bg-[#FFF9C4] border-2 border-dashed border-amber-300 shadow-xl">
+                <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-amber-600"></div></div>
+                <span class="text-4xl block animate-bounce mb-2">📌</span>
+                <h4 class="font-bold text-xl font-handwriting text-amber-950 mb-1">The Board is Fresh &amp; Ready!</h4>
+                <p class="text-xs text-gray-700 leading-relaxed">No notes are pinned yet. Be the very first person to write and stick a note onto the board using the form on the left!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. CONTACT -->
+    <section id="contact" class="py-6 max-w-5xl mx-auto">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold text-sky-100 font-handwriting flex items-center justify-center gap-3">
+          <span>📬</span> Contact Me
+        </h2>
+        <p class="text-sky-200/80 text-sm max-w-xl mx-auto mt-2">
+          Have an opportunity, a question, or want to collaborate? Send me a note or reach out through my links!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        <div class="md:col-span-5 space-y-3">
+          <h3 class="text-sky-200 font-bold text-lg mb-2">🔗 Connect & Inboxes</h3>
+
+          <a href="mailto:bhanukeerthi.2007@gmail.com" class="block sticky-card rounded-sm p-3.5 bg-[#DCFCE7] border border-[#86EFAC]/60 rotate-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-bold text-emerald-950 text-sm">Direct Email</p>
+                <p class="text-xs text-gray-700 font-mono">bhanukeerthi.2007@gmail.com</p>
+              </div>
+              <span class="text-sm font-bold text-emerald-900">&rarr;</span>
+            </div>
+          </a>
+
+          <a href="https://github.com/bhanukeerthi2007-Genral" target="_blank" class="block sticky-card rounded-sm p-3.5 bg-[#FFF9C4] border border-[#FBC02D]/40 -rotate-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-bold text-amber-950 text-sm">GitHub</p>
+                <p class="text-xs text-gray-700 font-mono">@bhanukeerthi2007-Genral</p>
+              </div>
+              <span class="text-sm font-bold text-amber-900">&rarr;</span>
+            </div>
+          </a>
+
+          <a href="https://www.linkedin.com/in/bhanukeerthi-vinod-8384652b3/" target="_blank" class="block sticky-card rounded-sm p-3.5 bg-[#E0F2FE] border border-[#7DD3FC]/60 rotate-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-bold text-sky-950 text-sm">LinkedIn</p>
+                <p class="text-xs text-gray-700 font-mono">in/bhanukeerthi-vinod</p>
+              </div>
+              <span class="text-sm font-bold text-sky-900">&rarr;</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="md:col-span-7">
+          <div class="sticky-card relative rounded-sm p-6 sm:p-8 bg-[#FFF9C4] border border-[#FBC02D]/40 rotate-1">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-blue-600"></div></div>
+            <h3 class="font-bold text-2xl text-[#78540B] font-handwriting mb-4">Leave a Pinned Message</h3>
+
+            <form onsubmit="event.preventDefault(); document.getElementById('preview-msg').classList.remove('hidden');" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Name</label>
+                <input type="text" required placeholder="Your Name" class="w-full bg-white/70 border border-black/15 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Email</label>
+                <input type="email" required placeholder="your.email@example.com" class="w-full bg-white/70 border border-black/15 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Message</label>
+                <textarea required rows="4" placeholder="What's on your mind? Tell me about your project, questions, or opportunities..." class="w-full bg-white/70 border border-black/15 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 resize-none"></textarea>
+              </div>
+
+              <div id="preview-msg" class="hidden p-2 rounded bg-blue-900 text-sky-100 text-xs font-medium text-center">
+                ✨ Note pinned successfully! I'll get back to you soon.
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                <span class="text-[11px] text-gray-600 font-mono">Direct: bhanukeerthi.2007@gmail.com</span>
+                <button type="submit" class="px-6 py-2.5 rounded-lg bg-[#1a3d6b] hover:bg-[#132f54] text-sky-50 font-bold text-sm shadow-md transition-all">
+                  📌 Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. FOOTER -->
+    <footer class="mt-16 pt-8 pb-12 border-t border-blue-900/40 text-center text-xs text-sky-300/80 font-mono space-y-1">
+      <p class="font-semibold text-sky-200 text-sm">
+        &copy; 2026 Bhanukeerthi
+      </p>
+      <p class="text-[11px] text-blue-400/60">
+        🏔️ Bluish Mountain Aesthetic &bull; Sticky Notes &bull; Next.js & Tailwind CSS
+      </p>
+    </footer>
+
+  </main>
+
+  <!-- FLOATING LIVE NATURE & WILDLIFE FEED CONTROLLER -->
+  <aside aria-label="Live Nature and Animal Feed Controller" class="fixed bottom-5 left-5 z-40 max-w-[calc(100vw-2.5rem)] sm:max-w-md font-sans">
+    <div id="nature-ctrl-box" class="bg-[#0b1c36]/95 backdrop-blur-md border border-blue-600/40 rounded-2xl shadow-2xl p-2.5 sm:p-3 text-sky-100 transition-all duration-300">
+      <!-- Header Row: Live Status + Feed Name + Minimize Button -->
+      <div class="flex items-center justify-between gap-2 mb-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+
+          <div class="truncate">
+            <span id="nature-feed-badge" class="text-[10px] font-mono tracking-wider uppercase text-emerald-400 font-bold block leading-none">
+              🔴 LIVE ANIMAL CAM
+            </span>
+            <h4 id="nature-feed-title" class="text-xs sm:text-sm font-bold text-sky-100 truncate flex items-center gap-1.5 mt-0.5">
+              <span>🐘</span> African Grasslands
+            </h4>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <!-- Cinema Mode Toggle (Dim/Focus) -->
+          <button
+            type="button"
+            onclick="toggleCinemaMode()"
+            id="cinema-btn"
+            class="px-2 py-1 rounded text-[11px] font-mono font-semibold transition-all flex items-center gap-1 border bg-blue-900/60 hover:bg-blue-800 text-sky-200 border-blue-700/50"
+            title="Focus on Live Wildlife & Ocean Waves (Dims sticky notes)"
+          >
+            <span>🎥 Focus</span>
+          </button>
+
+          <!-- Mute / Unmute Toggle -->
+          <button
+            type="button"
+            id="nature-audio-btn"
+            onclick="toggleNatureAudio()"
+            class="px-2 py-1 rounded text-[11px] font-mono font-semibold transition-all border bg-blue-900/60 hover:bg-blue-800 text-sky-300 border-blue-700/50"
+            title="Unmute Live Wildlife/Nature Sound"
+          >
+            🔇 Muted
+          </button>
+
+          <!-- Minimize Toggle -->
+          <button
+            type="button"
+            onclick="toggleNatureCtrlMin()"
+            class="w-6 h-6 rounded bg-blue-900/50 hover:bg-blue-800 text-sky-300 text-xs flex items-center justify-center transition-colors"
+            title="Toggle Controller"
+          >
+            <span id="nature-ctrl-arrow">▼</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Expandable Feed Selector Grid -->
+      <div id="nature-feed-options" class="space-y-2 pt-1 border-t border-blue-800/40">
+        <p id="nature-feed-desc" class="text-[11px] text-sky-200/80 leading-tight">
+          📍 <strong id="nature-feed-loc" class="text-white">Namib Grasslands, Namibia</strong> &mdash; 
+          <span id="nature-feed-sub">24/7 Live Stream: Wild zebras, giraffes, oryx, ostriches &amp; jackals gathered at the watering hole in real time.</span>
+        </p>
+
+        <!-- 4 Feed Switcher Tabs -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
+          <button
+            type="button"
+            onclick="setNatureFeed('savanna')"
+            id="feed-btn-savanna"
+            class="nature-feed-btn px-2 py-1.5 rounded-lg text-left text-xs transition-all flex items-center gap-1.5 border bg-gradient-to-r from-blue-600 to-sky-600 text-white font-bold border-sky-300 shadow-md scale-102"
+          >
+            <span class="text-base">🐘</span>
+            <div class="truncate">
+              <span class="block truncate text-[11px] font-medium leading-none">Savanna</span>
+              <span class="text-[9px] opacity-75 font-mono">Live Cam</span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick="setNatureFeed('forest')"
+            id="feed-btn-forest"
+            class="nature-feed-btn px-2 py-1.5 rounded-lg text-left text-xs transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200/90 border-blue-800/40"
+          >
+            <span class="text-base">🌲</span>
+            <div class="truncate">
+              <span class="block truncate text-[11px] font-medium leading-none">Forest</span>
+              <span class="text-[9px] opacity-75 font-mono">Live Bears</span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick="setNatureFeed('ocean')"
+            id="feed-btn-ocean"
+            class="nature-feed-btn px-2 py-1.5 rounded-lg text-left text-xs transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200/90 border-blue-800/40"
+          >
+            <span class="text-base">🌊</span>
+            <div class="truncate">
+              <span class="block truncate text-[11px] font-medium leading-none">Waves</span>
+              <span class="text-[9px] opacity-75 font-mono">Movable</span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick="setNatureFeed('mountain')"
+            id="feed-btn-mountain"
+            class="nature-feed-btn px-2 py-1.5 rounded-lg text-left text-xs transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200/90 border-blue-800/40"
+          >
+            <span class="text-base">🏔️</span>
+            <div class="truncate">
+              <span class="block truncate text-[11px] font-medium leading-none">Mountains</span>
+              <span class="text-[9px] opacity-75 font-mono">Alpine Blue</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- FLOATING ALPINE SOUNDSCAPE & MUSIC STUDIO -->
+  <aside aria-label="Alpine Audio and Music Studio" class="fixed bottom-5 right-5 z-40 font-sans">
+    <div id="soundscape-box" class="bg-[#0a182d]/95 border border-blue-600/40 text-sky-100 p-3 sm:p-4 rounded-2xl shadow-2xl backdrop-blur-md max-w-xs transition-all flex flex-col gap-2.5">
+      <div class="flex items-center justify-between gap-3 border-b border-blue-800/40 pb-1.5 text-xs">
+        <div class="flex items-center gap-1.5 font-mono text-sky-200">
+          <span id="snd-track-icon">🎵</span>
+          <span class="font-bold">Alpine Audio Studio</span>
+        </div>
+        <button onclick="toggleSoundscapeMin()" class="text-gray-400 hover:text-white text-xs px-1">✕</button>
+      </div>
+
+      <div class="flex items-center justify-between gap-2">
+        <button id="soundscape-toggle-btn" onclick="toggleSoundscapePlay()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-900/80 hover:bg-blue-800 text-sky-100 border border-blue-700/50 flex items-center gap-1.5">
+          <span>▶ Play Music</span>
+        </button>
+
+        <div id="soundscape-waves" class="flex items-end gap-1 h-4 px-2">
+          <span id="eq-1" class="w-1 bg-sky-400 rounded-xs h-1 opacity-40"></span>
+          <span id="eq-2" class="w-1 bg-sky-300 rounded-xs h-1 opacity-40"></span>
+          <span id="eq-3" class="w-1 bg-sky-400 rounded-xs h-1 opacity-40"></span>
+          <span id="eq-4" class="w-1 bg-cyan-300 rounded-xs h-1 opacity-40"></span>
+        </div>
+      </div>
+
+      <!-- 5 Track Selectors -->
+      <div>
+        <label class="block text-[10px] uppercase font-mono text-sky-300/80 mb-1">Select Track:</label>
+        <div class="grid grid-cols-3 gap-1 text-[11px] font-mono">
+          <button id="track-btn-lofi" onclick="setSoundscapeTrack('lofi')" class="snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-800 text-white font-bold border-sky-400/60 shadow-xs">
+            <span>🎵</span> Lo-Fi Zen
+          </button>
+          <button id="track-btn-wind" onclick="setSoundscapeTrack('wind')" class="snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-950/60 text-sky-300 hover:bg-blue-900/60 border-blue-900/40">
+            <span>🌲</span> Breeze
+          </button>
+          <button id="track-btn-rain" onclick="setSoundscapeTrack('rain')" class="snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-950/60 text-sky-300 hover:bg-blue-900/60 border-blue-900/40">
+            <span>🌧️</span> Rain
+          </button>
+          <button id="track-btn-ocean" onclick="setSoundscapeTrack('ocean')" class="snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-950/60 text-sky-300 hover:bg-blue-900/60 border-blue-900/40">
+            <span>🌊</span> Waves
+          </button>
+          <button id="track-btn-chimes" onclick="setSoundscapeTrack('chimes')" class="snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-950/60 text-sky-300 hover:bg-blue-900/60 border-blue-900/40 col-span-2">
+            <span>🔔</span> Crystal Chimes
+          </button>
+        </div>
+      </div>
+
+      <!-- Volume Slider -->
+      <div class="pt-1 border-t border-blue-900/40 flex items-center justify-between gap-2 text-[11px] text-sky-300/80">
+        <span class="font-mono flex items-center gap-1">
+          <span>🔊</span> <span id="snd-vol-label">60%</span>
+        </span>
+        <input type="range" min="0" max="1" step="0.05" value="0.6" oninput="setSoundscapeVolume(this.value)" class="w-28 h-1.5 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-sky-400">
+      </div>
+    </div>
+
+    <button id="soundscape-min-btn" onclick="toggleSoundscapeMin()" class="hidden bg-[#0c1e38]/95 border border-blue-500/40 text-sky-200 px-3.5 py-2 rounded-full shadow-2xl items-center gap-2 text-xs font-mono backdrop-blur-md hover:scale-105">
+      <span>🎵 Audio Studio</span>
+    </button>
+  </aside>
+
+  <!-- JAVASCRIPT: SNAKE GAME, VISITOR BOARD, SOUNDSCAPE & FIREFLIES -->
+  <script>
+    // --- 1. FIREFLIES GENERATOR ---
+    const firefliesContainer = document.getElementById('fireflies-container');
+    if (firefliesContainer) {
+      for (let i = 0; i < 18; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'absolute rounded-full bg-cyan-300 shadow-[0_0_8px_#38bdf8] opacity-70 animate-pulse';
+        dot.style.left = (Math.random() * 100) + '%';
+        dot.style.top = (20 + Math.random() * 70) + '%';
+        const s = 3 + Math.random() * 4;
+        dot.style.width = s + 'px';
+        dot.style.height = s + 'px';
+        dot.style.animationDuration = (5 + Math.random() * 6) + 's';
+        dot.style.animationDelay = (Math.random() * 4) + 's';
+        firefliesContainer.appendChild(dot);
+      }
+    }
+
+    // --- 2. MULTI-GAME ARCADE & LEADERBOARD SYSTEM ---
+    let activeArcadeTab = 'snake';
+    let arcadeLeaderboard = [];
+
+    function initLeaderboard() {
+      try {
+        const saved = localStorage.getItem('bhanu_arcade_leaderboard');
+        if (saved) {
+          arcadeLeaderboard = JSON.parse(saved);
+        } else {
+          arcadeLeaderboard = [
+            { id: '1', name: 'Bhanu (Host)', game: 'Alpine Snake', score: 140, date: 'Nov 18' },
+            { id: '2', name: 'Aarav', game: 'Brick Breaker', score: 180, date: 'Nov 17' },
+            { id: '3', name: 'MountainRanger', game: 'Alpine Snake', score: 90, date: 'Nov 16' }
+          ];
+          localStorage.setItem('bhanu_arcade_leaderboard', JSON.stringify(arcadeLeaderboard));
+        }
+      } catch(e) {
+        arcadeLeaderboard = [];
+      }
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard() {
+      const list = document.getElementById('leaderboard-list');
+      const badge = document.getElementById('leaderboard-count-badge');
+      if (badge) badge.innerText = `(${arcadeLeaderboard.length})`;
+      if (!list) return;
+
+      if (arcadeLeaderboard.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-8 text-gray-600 space-y-1">
+            <span class="text-3xl block">🏆</span>
+            <p class="font-bold text-sm">Leaderboard is Fresh &amp; Clear!</p>
+            <p class="text-xs text-gray-500">Play either Alpine Snake or Brick Breaker to record the first high score!</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = arcadeLeaderboard.map((entry, idx) => `
+        <div class="flex items-center justify-between p-2 rounded text-xs font-mono border ${
+          idx === 0 ? 'bg-amber-100 border-amber-300 text-amber-950 font-bold' :
+          idx === 1 ? 'bg-slate-100 border-slate-300 text-slate-800' :
+          idx === 2 ? 'bg-amber-50 border-amber-200 text-amber-900' :
+          'bg-white/60 border-black/5 text-gray-800'
+        }">
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-5 text-center font-bold">${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '#' + (idx + 1)}</span>
+            <div class="truncate">
+              <span class="font-bold truncate">${entry.name}</span>
+              <span class="text-[10px] block opacity-70">${entry.game} &bull; ${entry.date}</span>
+            </div>
+          </div>
+          <span class="text-sm font-extrabold text-emerald-800 ml-2">${entry.score} pts</span>
+        </div>
+      `).join('');
+    }
+
+    function clearLeaderboardRecords() {
+      if (confirm('Are you sure you want to clear the entire leaderboard? This lets you track fresh new high scores.')) {
+        arcadeLeaderboard = [];
+        try { localStorage.setItem('bhanu_arcade_leaderboard', JSON.stringify([])); } catch(e){}
+        renderLeaderboard();
+      }
+    }
+
+    let pendingArcadeScore = null;
+    function promptScoreSubmission(gameName, scoreVal) {
+      if (scoreVal <= 0) return;
+      pendingArcadeScore = { game: gameName, score: scoreVal };
+      document.getElementById('score-submit-title').innerText = `🌟 New Run: ${scoreVal} pts in ${gameName}!`;
+      document.getElementById('score-submit-card').classList.remove('hidden');
+    }
+
+    function submitPlayerScore(e) {
+      e.preventDefault();
+      const input = document.getElementById('player-name-input');
+      const name = input.value.trim();
+      if (!name || !pendingArcadeScore) return;
+
+      const newEntry = {
+        id: Date.now().toString(),
+        name: name,
+        game: pendingArcadeScore.game,
+        score: pendingArcadeScore.score,
+        date: 'Today'
+      };
+
+      arcadeLeaderboard.push(newEntry);
+      arcadeLeaderboard.sort((a, b) => b.score - a.score);
+      arcadeLeaderboard = arcadeLeaderboard.slice(0, 15);
+      try { localStorage.setItem('bhanu_arcade_leaderboard', JSON.stringify(arcadeLeaderboard)); } catch(e){}
+
+      input.value = '';
+      pendingArcadeScore = null;
+      document.getElementById('score-submit-card').classList.add('hidden');
+      switchArcadeView('leaderboard');
+    }
+
+    function switchArcadeView(tab) {
+      activeArcadeTab = tab;
+      const snakeView = document.getElementById('arcade-snake-view');
+      const brickView = document.getElementById('arcade-brick-view');
+      const lbView = document.getElementById('arcade-leaderboard-view');
+
+      const btnSnake = document.getElementById('tab-btn-snake');
+      const btnBrick = document.getElementById('tab-btn-brick');
+      const btnLb = document.getElementById('tab-btn-leaderboard');
+
+      snakeView.classList.add('hidden');
+      brickView.classList.add('hidden');
+      lbView.classList.add('hidden');
+
+      btnSnake.className = 'px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200 border-blue-800/40';
+      btnBrick.className = 'px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200 border-blue-800/40';
+      btnLb.className = 'px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-amber-300 border-amber-500/40';
+
+      if (tab === 'snake') {
+        snakeView.classList.remove('hidden');
+        btnSnake.className = 'px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-emerald-600 text-white border-emerald-400 shadow-lg scale-105';
+      } else if (tab === 'brick') {
+        brickView.classList.remove('hidden');
+        btnBrick.className = 'px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-sky-600 text-white border-sky-400 shadow-lg scale-105';
+      } else {
+        lbView.classList.remove('hidden');
+        btnLb.className = 'px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center gap-1.5 border bg-amber-500 text-amber-950 border-amber-300 shadow-lg scale-105';
+        renderLeaderboard();
+      }
+    }
+
+    // --- GAME A: SNAKE ENGINE ---
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    const GRID = 16;
+    const CELL = 20;
+    let snake = [{x: 8, y: 8}, {x: 8, y: 9}, {x: 8, y: 10}];
+    let dir = 'UP';
+    let nextDir = 'UP';
+    let food = {x: 5, y: 5};
+    let foodEmoji = '🍎';
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem('bhanu_snake_high') || '0', 10);
+    let snakeInterval = null;
+    let snakeSpeed = 110;
+    let isPlaying = false;
+    let snakeSound = true;
+
+    const snakeHighEl = document.getElementById('snake-high');
+    if (snakeHighEl) snakeHighEl.innerText = highScore;
+
+    function playBeep(freq, type = 'sine', dur = 0.08) {
+      if (!snakeSound) return;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        const c = new AC();
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, c.currentTime);
+        g.gain.setValueAtTime(0.08, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+        o.connect(g);
+        g.connect(c.destination);
+        o.start();
+        o.stop(c.currentTime + dur);
+      } catch(e){}
+    }
+
+    function toggleSnakeSound() {
+      snakeSound = !snakeSound;
+      const btn = document.getElementById('sound-btn');
+      if (btn) btn.innerText = snakeSound ? '🔊 Sound On' : '🔇 Muted';
+    }
+
+    function setSnakeSpeed(val, btn) {
+      snakeSpeed = val;
+      document.querySelectorAll('.speed-btn').forEach(b => {
+        b.className = 'speed-btn px-2 py-0.5 rounded bg-white hover:bg-white text-gray-800';
+      });
+      btn.className = 'speed-btn px-2 py-0.5 rounded bg-emerald-800 text-white font-bold';
+      if (isPlaying) {
+        clearInterval(snakeInterval);
+        snakeInterval = setInterval(gameTick, snakeSpeed);
+      }
+    }
+
+    function setSnakeDir(d) {
+      if (d === 'UP' && dir !== 'DOWN') nextDir = 'UP';
+      if (d === 'DOWN' && dir !== 'UP') nextDir = 'DOWN';
+      if (d === 'LEFT' && dir !== 'RIGHT') nextDir = 'LEFT';
+      if (d === 'RIGHT' && dir !== 'LEFT') nextDir = 'RIGHT';
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (activeArcadeTab === 'snake') {
+        if (['ArrowUp', 'KeyW'].includes(e.code)) { e.preventDefault(); setSnakeDir('UP'); }
+        if (['ArrowDown', 'KeyS'].includes(e.code)) { e.preventDefault(); setSnakeDir('DOWN'); }
+        if (['ArrowLeft', 'KeyA'].includes(e.code)) { e.preventDefault(); setSnakeDir('LEFT'); }
+        if (['ArrowRight', 'KeyD'].includes(e.code)) { e.preventDefault(); setSnakeDir('RIGHT'); }
+      }
+    });
+
+    function spawnFood() {
+      const emojis = ['🍎', '🍒', '🍃', '🍄', '🍓'];
+      foodEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      let newF;
+      let collision;
+      do {
+        newF = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
+        collision = snake.some(s => s.x === newF.x && s.y === newF.y);
+      } while (collision);
+      food = newF;
+    }
+
+    function drawSnake() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 320, 320);
+
+      // Draw food
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(foodEmoji, food.x * CELL + CELL/2, food.y * CELL + CELL/2);
+
+      // Draw snake
+      snake.forEach((seg, i) => {
+        ctx.fillStyle = i === 0 ? '#064e3b' : '#047857';
+        ctx.beginPath();
+        ctx.roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, i === 0 ? 4 : 2);
+        ctx.fill();
+        if (i === 0) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '8px sans-serif';
+          ctx.fillText('•‿•', seg.x * CELL + CELL/2, seg.y * CELL + CELL/2);
+        }
+      });
+    }
+
+    function gameTick() {
+      dir = nextDir;
+      const head = { ...snake[0] };
+      if (dir === 'UP') head.y -= 1;
+      if (dir === 'DOWN') head.y += 1;
+      if (dir === 'LEFT') head.x -= 1;
+      if (dir === 'RIGHT') head.x += 1;
+
+      // Collisions
+      if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID || snake.some(s => s.x === head.x && s.y === head.y)) {
+        clearInterval(snakeInterval);
+        isPlaying = false;
+        playBeep(180, 'sawtooth', 0.25);
+        document.getElementById('snake-msg-title').innerText = 'Ouch! Hit a ridge!';
+        document.getElementById('snake-msg-sub').innerText = 'Final Score: ' + score;
+        document.getElementById('snake-overlay').classList.remove('hidden');
+
+        if (score > 0) {
+          promptScoreSubmission('Alpine Snake', score);
+        }
+        return;
+      }
+
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        document.getElementById('snake-score').innerText = score;
+        if (score > highScore) {
+          highScore = score;
+          try { localStorage.setItem('bhanu_snake_high', highScore); } catch(e){}
+          document.getElementById('snake-high').innerText = highScore;
+        }
+        playBeep(587, 'sine', 0.1);
+        spawnFood();
+      } else {
+        snake.pop();
+      }
+      drawSnake();
+    }
+
+    function startSnakeGame() {
+      snake = [{x: 8, y: 8}, {x: 8, y: 9}, {x: 8, y: 10}];
+      dir = 'UP';
+      nextDir = 'UP';
+      score = 0;
+      document.getElementById('snake-score').innerText = 0;
+      document.getElementById('snake-overlay').classList.add('hidden');
+      spawnFood();
+      isPlaying = true;
+      playBeep(440, 'triangle', 0.1);
+      drawSnake();
+      clearInterval(snakeInterval);
+      snakeInterval = setInterval(gameTick, snakeSpeed);
+    }
+
+    // --- GAME B: BRICK BREAKER ENGINE ---
+    const brickCanvas = document.getElementById('brick-canvas');
+    const brickCtx = brickCanvas ? brickCanvas.getContext('2d') : null;
+    let brickScore = 0;
+    let brickLives = 3;
+    let isBrickRunning = false;
+    let brickAnimId = null;
+
+    const bPaddle = { x: 130, w: 60, h: 10 };
+    const bBall = { x: 160, y: 260, r: 5, vx: 2.5, vy: -3.5 };
+    let bricks = [];
+
+    function initBricks() {
+      const rows = 4, cols = 6, bW = 44, bH = 14, pad = 6, topOff = 30, leftOff = 14;
+      const colors = ['#DC2626', '#D97706', '#059669', '#2563EB'];
+      const points = [40, 30, 20, 10];
+      bricks = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          bricks.push({
+            x: leftOff + c * (bW + pad),
+            y: topOff + r * (bH + pad),
+            w: bW, h: bH,
+            color: colors[r],
+            points: points[r],
+            alive: true
+          });
+        }
+      }
+    }
+
+    function startBrickGame() {
+      initBricks();
+      bPaddle.x = 130;
+      bBall.x = 160;
+      bBall.y = 260;
+      bBall.vx = Math.random() > 0.5 ? 2.5 : -2.5;
+      bBall.vy = -3.5;
+      brickScore = 0;
+      brickLives = 3;
+      document.getElementById('brick-score').innerText = '0';
+      document.getElementById('brick-lives').innerText = '❤️❤️❤️';
+      document.getElementById('brick-overlay').classList.add('hidden');
+      isBrickRunning = true;
+      playBeep(523, 'triangle', 0.1);
+      if (brickAnimId) cancelAnimationFrame(brickAnimId);
+      brickLoop();
+    }
+
+    if (brickCanvas) {
+      brickCanvas.addEventListener('mousemove', (e) => {
+        const rect = brickCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const scale = 320 / rect.width;
+        bPaddle.x = Math.max(0, Math.min(320 - bPaddle.w, mouseX * scale - bPaddle.w / 2));
+      });
+      brickCanvas.addEventListener('touchmove', (e) => {
+        if (!e.touches[0]) return;
+        const rect = brickCanvas.getBoundingClientRect();
+        const touchX = e.touches[0].clientX - rect.left;
+        const scale = 320 / rect.width;
+        bPaddle.x = Math.max(0, Math.min(320 - bPaddle.w, touchX * scale - bPaddle.w / 2));
+      });
+    }
+
+    function brickLoop() {
+      if (!isBrickRunning || !brickCtx) return;
+      brickCtx.clearRect(0, 0, 320, 320);
+
+      // Move ball
+      bBall.x += bBall.vx;
+      bBall.y += bBall.vy;
+
+      // Walls
+      if (bBall.x - bBall.r <= 0 || bBall.x + bBall.r >= 320) { bBall.vx = -bBall.vx; playBeep(350, 'sine', 0.04); }
+      if (bBall.y - bBall.r <= 0) { bBall.vy = -bBall.vy; playBeep(350, 'sine', 0.04); }
+
+      // Paddle collision
+      if (bBall.y + bBall.r >= 320 - 22 && bBall.y - bBall.r <= 320 - 12 && bBall.x >= bPaddle.x && bBall.x <= bPaddle.x + bPaddle.w) {
+        const hit = (bBall.x - (bPaddle.x + bPaddle.w / 2)) / (bPaddle.w / 2);
+        bBall.vx = hit * 4;
+        bBall.vy = -Math.abs(bBall.vy);
+        playBeep(480, 'sine', 0.05);
+      }
+
+      // Ball misses paddle
+      if (bBall.y - bBall.r > 320) {
+        brickLives--;
+        document.getElementById('brick-lives').innerText = '❤️'.repeat(Math.max(0, brickLives));
+        playBeep(160, 'sawtooth', 0.2);
+
+        if (brickLives <= 0) {
+          isBrickRunning = false;
+          document.getElementById('brick-msg-title').innerText = 'Out of Lives!';
+          document.getElementById('brick-msg-sub').innerText = 'Final Score: ' + brickScore;
+          document.getElementById('brick-overlay').classList.remove('hidden');
+          if (brickScore > 0) promptScoreSubmission('Brick Breaker', brickScore);
+          return;
+        } else {
+          bBall.x = bPaddle.x + bPaddle.w / 2;
+          bBall.y = 260;
+          bBall.vx = Math.random() > 0.5 ? 2.5 : -2.5;
+          bBall.vy = -3.5;
+        }
+      }
+
+      // Bricks collision
+      let aliveCount = 0;
+      bricks.forEach(b => {
+        if (!b.alive) return;
+        aliveCount++;
+        if (bBall.x + bBall.r >= b.x && bBall.x - bBall.r <= b.x + b.w && bBall.y + bBall.r >= b.y && bBall.y - bBall.r <= b.y + b.h) {
+          b.alive = false;
+          bBall.vy = -bBall.vy;
+          brickScore += b.points;
+          document.getElementById('brick-score').innerText = brickScore;
+          playBeep(650 + b.points * 6, 'sine', 0.08);
+        }
+      });
+
+      if (aliveCount === 0 && bricks.length > 0) {
+        isBrickRunning = false;
+        playBeep(880, 'triangle', 0.4);
+        document.getElementById('brick-msg-title').innerText = '🎉 Mountain Cleared!';
+        document.getElementById('brick-msg-sub').innerText = 'Total Score: ' + (brickScore + 100);
+        document.getElementById('brick-overlay').classList.remove('hidden');
+        promptScoreSubmission('Brick Breaker', brickScore + 100);
+        return;
+      }
+
+      // Render
+      bricks.forEach(b => {
+        if (!b.alive) return;
+        brickCtx.fillStyle = b.color;
+        brickCtx.beginPath();
+        brickCtx.roundRect(b.x, b.y, b.w, b.h, 3);
+        brickCtx.fill();
+        brickCtx.strokeStyle = 'rgba(0,0,0,0.15)';
+        brickCtx.stroke();
+      });
+
+      brickCtx.fillStyle = '#1e3a8a';
+      brickCtx.beginPath();
+      brickCtx.roundRect(bPaddle.x, 320 - 20, bPaddle.w, bPaddle.h, 4);
+      brickCtx.fill();
+
+      brickCtx.fillStyle = '#38bdf8';
+      brickCtx.beginPath();
+      brickCtx.arc(bBall.x, bBall.y, bBall.r, 0, Math.PI * 2);
+      brickCtx.fill();
+
+      brickAnimId = requestAnimationFrame(brickLoop);
+    }
+
+    // --- 3. COMMUNITY STICKY BOARD ---
+    let currentBoardBg = '#FFF9C4';
+    let currentBoardBorder = '#FBC02D';
+
+    function selectBoardColor(c, bg, border) {
+      currentBoardBg = bg;
+      currentBoardBorder = border;
+      const card = document.getElementById('new-note-card');
+      card.style.backgroundColor = bg;
+      card.style.borderColor = border;
+    }
+
+    function handlePostUserNote(e) {
+      e.preventDefault();
+      const author = document.getElementById('board-author').value.trim();
+      const msg = document.getElementById('board-msg').value.trim();
+      if (!author || !msg) return;
+
+      const rot = (Math.random() * 4 - 2).toFixed(1);
+      const grid = document.getElementById('community-notes-grid');
+      const emptyState = document.getElementById('board-empty-state');
+      if (emptyState) {
+        emptyState.style.display = 'none';
+      }
+
+      const noteEl = document.createElement('div');
+      noteEl.className = 'sticky-card relative rounded-sm p-5 border shadow-xl flex flex-col justify-between';
+      noteEl.style.backgroundColor = currentBoardBg;
+      noteEl.style.borderColor = currentBoardBorder;
+      noteEl.style.transform = `rotate(${rot}deg)`;
+      noteEl.innerHTML = `
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10"><div class="pin-head bg-blue-600"></div></div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold text-lg font-handwriting text-gray-900">${author}</h4>
+            <span class="text-[10px] font-mono bg-white/70 px-2 py-0.5 rounded">Just now</span>
+          </div>
+          <p class="text-xs text-gray-800 leading-relaxed mb-3">&ldquo;${msg}&rdquo;</p>
+        </div>
+        <div class="pt-2 border-t border-black/10 flex items-center justify-between text-xs">
+          <span class="text-[11px] text-gray-500 font-mono">By ${author}</span>
+          <button onclick="likeNote(this)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/70 hover:bg-white text-rose-600 font-semibold border border-black/10">
+            <span>❤️</span> <span class="like-count">1</span>
+          </button>
+        </div>
+      `;
+      grid.prepend(noteEl);
+
+      document.getElementById('board-author').value = '';
+      document.getElementById('board-msg').value = '';
+      document.getElementById('board-success').classList.remove('hidden');
+      setTimeout(() => document.getElementById('board-success').classList.add('hidden'), 3000);
+    }
+
+    function likeNote(btn) {
+      const span = btn.querySelector('.like-count');
+      span.innerText = parseInt(span.innerText, 10) + 1;
+      btn.style.transform = 'scale(1.25)';
+      setTimeout(() => btn.style.transform = 'scale(1)', 200);
+    }
+
+    // --- 4. PROCEDURAL ALPINE MUSIC & SOUNDSCAPE STUDIO ---
+    let sndCtx = null;
+    let sndMasterGain = null;
+    let sndLoopTimer = null;
+    let sndActiveSources = [];
+    let isSndPlaying = false;
+    let sndCurrentTrack = 'lofi';
+    let sndVolume = 0.6;
+
+    const TRACK_ICONS = { lofi: '🎵', wind: '🌲', rain: '🌧️', ocean: '🌊', chimes: '🔔' };
+
+    function stopSoundscape() {
+      if (sndLoopTimer) { clearInterval(sndLoopTimer); sndLoopTimer = null; }
+      sndActiveSources.forEach(s => { try { s.stop(); } catch(e){} });
+      sndActiveSources = [];
+      if (sndCtx && sndCtx.state !== 'closed') { sndCtx.close().catch(()=>{}); sndCtx = null; }
+      isSndPlaying = false;
+
+      document.getElementById('soundscape-toggle-btn').innerHTML = '<span>▶ Play Music</span>';
+      document.getElementById('soundscape-toggle-btn').className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-900/80 hover:bg-blue-800 text-sky-100 border border-blue-700/50 flex items-center gap-1.5';
+      [1, 2, 3, 4].forEach(i => {
+        const el = document.getElementById(`eq-${i}`);
+        if (el) el.className = 'w-1 bg-sky-400 rounded-xs h-1 opacity-40';
+      });
+    }
+
+    function startSoundscape(track) {
+      stopSoundscape();
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        sndCtx = new AC();
+        sndMasterGain = sndCtx.createGain();
+        sndMasterGain.gain.setValueAtTime(sndVolume * 0.12, sndCtx.currentTime);
+        sndMasterGain.connect(sndCtx.destination);
+
+        if (track === 'wind') {
+          const bufLen = sndCtx.sampleRate * 2;
+          const noise = sndCtx.createBuffer(1, bufLen, sndCtx.sampleRate);
+          const out = noise.getChannelData(0);
+          let last = 0.0;
+          for (let i = 0; i < bufLen; i++) {
+            const w = Math.random() * 2 - 1;
+            out[i] = (last + 0.02 * w) / 1.02;
+            last = out[i];
+            out[i] *= 3.8;
+          }
+          const src = sndCtx.createBufferSource();
+          src.buffer = noise;
+          src.loop = true;
+          const filter = sndCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(320, sndCtx.currentTime);
+          src.connect(filter);
+          filter.connect(sndMasterGain);
+          src.start();
+          sndActiveSources.push(src);
+        } else if (track === 'rain') {
+          sndLoopTimer = setInterval(() => {
+            if (!sndCtx || sndCtx.state === 'closed') return;
+            const o = sndCtx.createOscillator();
+            const g = sndCtx.createGain();
+            o.frequency.setValueAtTime(550 + Math.random() * 850, sndCtx.currentTime);
+            g.gain.setValueAtTime(0.015 + Math.random() * 0.025, sndCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, sndCtx.currentTime + 0.07);
+            o.connect(g);
+            g.connect(sndMasterGain);
+            o.start();
+            o.stop(sndCtx.currentTime + 0.07);
+          }, 38);
+        } else if (track === 'lofi') {
+          // Generative Pentatonic Melodic Lo-Fi Chords
+          const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
+          sndLoopTimer = setInterval(() => {
+            if (!sndCtx || sndCtx.state === 'closed') return;
+            const freq = scale[Math.floor(Math.random() * scale.length)];
+            const osc = sndCtx.createOscillator();
+            const g = sndCtx.createGain();
+            osc.type = Math.random() > 0.5 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, sndCtx.currentTime);
+
+            const dur = 1.8 + Math.random() * 1.2;
+            g.gain.setValueAtTime(0.001, sndCtx.currentTime);
+            g.gain.linearRampToValueAtTime(0.045, sndCtx.currentTime + 0.25);
+            g.gain.exponentialRampToValueAtTime(0.0001, sndCtx.currentTime + dur);
+
+            const filter = sndCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(750, sndCtx.currentTime);
+
+            osc.connect(filter);
+            filter.connect(g);
+            g.connect(sndMasterGain);
+            osc.start();
+            osc.stop(sndCtx.currentTime + dur);
+          }, 650);
+        } else if (track === 'ocean') {
+          const bufLen = sndCtx.sampleRate * 2;
+          const noise = sndCtx.createBuffer(1, bufLen, sndCtx.sampleRate);
+          const out = noise.getChannelData(0);
+          for (let i = 0; i < bufLen; i++) out[i] = Math.random() * 2 - 1;
+
+          const src = sndCtx.createBufferSource();
+          src.buffer = noise;
+          src.loop = true;
+
+          const filter = sndCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(250, sndCtx.currentTime);
+          filter.Q.setValueAtTime(1.2, sndCtx.currentTime);
+
+          const swellGain = sndCtx.createGain();
+          swellGain.gain.setValueAtTime(0.02, sndCtx.currentTime);
+
+          let waveTime = 0;
+          sndLoopTimer = setInterval(() => {
+            if (!sndCtx || sndCtx.state === 'closed') return;
+            waveTime += 0.08;
+            const swell = (Math.sin(waveTime) + 1) * 0.5;
+            filter.frequency.setValueAtTime(180 + swell * 280, sndCtx.currentTime);
+            swellGain.gain.setValueAtTime(0.01 + swell * 0.04, sndCtx.currentTime);
+          }, 100);
+
+          src.connect(filter);
+          filter.connect(swellGain);
+          swellGain.connect(sndMasterGain);
+          src.start();
+          sndActiveSources.push(src);
+        } else if (track === 'chimes') {
+          const freqs = [784.0, 880.0, 987.77, 1174.66, 1318.51, 1567.98];
+          sndLoopTimer = setInterval(() => {
+            if (!sndCtx || sndCtx.state === 'closed') return;
+            if (Math.random() < 0.35) {
+              const freq = freqs[Math.floor(Math.random() * freqs.length)];
+              const osc = sndCtx.createOscillator();
+              const g = sndCtx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, sndCtx.currentTime);
+              g.gain.setValueAtTime(0.025, sndCtx.currentTime);
+              g.gain.exponentialRampToValueAtTime(0.0001, sndCtx.currentTime + 2.2);
+              osc.connect(g);
+              g.connect(sndMasterGain);
+              osc.start();
+              osc.stop(sndCtx.currentTime + 2.2);
+            }
+          }, 320);
+        }
+
+        isSndPlaying = true;
+        document.getElementById('soundscape-toggle-btn').innerHTML = '<span>⏸ Pause Music</span>';
+        document.getElementById('soundscape-toggle-btn').className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-sky-400 text-sky-950 flex items-center gap-1.5 shadow-md';
+        [1, 2, 3, 4].forEach((i, idx) => {
+          const el = document.getElementById(`eq-${i}`);
+          if (el) el.className = `w-1 bg-sky-300 rounded-xs animate-bounce h-${(idx % 3) + 2} delay-${idx * 75}`;
+        });
+      } catch(e){}
+    }
+
+    function toggleSoundscapePlay() {
+      if (isSndPlaying) stopSoundscape();
+      else startSoundscape(sndCurrentTrack);
+    }
+
+    function setSoundscapeTrack(t) {
+      sndCurrentTrack = t;
+      document.getElementById('snd-track-icon').innerText = TRACK_ICONS[t] || '🎵';
+      document.querySelectorAll('.snd-track-btn').forEach(b => {
+        b.className = 'snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-950/60 text-sky-300 hover:bg-blue-900/60 border-blue-900/40';
+      });
+      const activeBtn = document.getElementById(`track-btn-${t}`);
+      if (activeBtn) {
+        activeBtn.className = 'snd-track-btn px-2 py-1 rounded text-center transition-all flex items-center justify-center gap-1 border bg-blue-800 text-white font-bold border-sky-400/60 shadow-xs';
+      }
+      if (isSndPlaying) startSoundscape(t);
+    }
+
+    function setSoundscapeVolume(v) {
+      sndVolume = parseFloat(v);
+      const lbl = document.getElementById('snd-vol-label');
+      if (lbl) lbl.innerText = Math.round(sndVolume * 100) + '%';
+      if (sndMasterGain && sndCtx) {
+        sndMasterGain.gain.setValueAtTime(sndVolume * 0.12, sndCtx.currentTime);
+      }
+    }
+
+    function toggleSoundscapeMin() {
+      const box = document.getElementById('soundscape-box');
+      const minBtn = document.getElementById('soundscape-min-btn');
+      box.classList.toggle('hidden');
+      minBtn.classList.toggle('hidden');
+      minBtn.classList.toggle('flex');
+    }
+
+    // --- 5. LIVE NATURE, ANIMAL FEEDS & MOVABLE OCEAN WAVES ENGINE ---
+    const NATURE_FEEDS_DATA = {
+      mountain: {
+        id: null,
+        name: 'Twilight Mountains',
+        tag: 'Alpine Ridges',
+        icon: '🏔️',
+        loc: 'Alpine Peaks & Pine Forest',
+        desc: 'Default Bluish Mountain View: Midnight blue alpine summits, moonlit mountain mist, and whispering pine silhouettes.',
+        badge: '🌙 BLUE NATURE'
+      },
+      savanna: {
+        id: 'ydYDqZQpim8',
+        name: 'African Grasslands',
+        tag: 'Savanna Waterhole',
+        icon: '🐘',
+        loc: 'Namib Grasslands, Namibia',
+        desc: '24/7 Live Stream: Wild zebras, giraffes, oryx, ostriches & jackals gathered at the watering hole in real time.',
+        badge: '🔴 LIVE ANIMAL CAM'
+      },
+      forest: {
+        id: 'J7ZrIDvqlic',
+        name: 'Katmai Wild Forest',
+        tag: 'River & Bears',
+        icon: '🌲',
+        loc: 'Katmai National Park, Alaska',
+        desc: '24/7 Live Stream: Wild brown bears catching salmon in forest river rapids and wilderness pine forest.',
+        badge: '🔴 LIVE FOREST CAM'
+      },
+      ocean: {
+        id: 'xdQxsBirAFQ',
+        name: 'Movable Ocean Waves',
+        tag: 'Living Waves',
+        icon: '🌊',
+        loc: 'Pacific Coastal Surf',
+        desc: 'Interactive Living Ocean Waves: Physics-driven undulating waves with cursor mouse ripples and aerial coastal surf.',
+        badge: '✨ INTERACTIVE MOVABLE'
+      }
+    };
+
+    let currentNatureFeed = 'mountain';
+    let isNatureMuted = true;
+    let isCinemaMode = false;
+    let isNatureCtrlExpanded = true;
+
+    function setNatureFeed(feedKey) {
+      currentNatureFeed = feedKey;
+      const data = NATURE_FEEDS_DATA[feedKey];
+      if (!data) return;
+
+      // Update Header Text
+      document.getElementById('nature-feed-badge').innerText = data.badge;
+      document.getElementById('nature-feed-title').innerHTML = `<span>${data.icon}</span> ${data.name}`;
+      document.getElementById('nature-feed-loc').innerText = data.loc;
+      document.getElementById('nature-feed-sub').innerText = data.desc;
+
+      // Update Active Tab Styling
+      const btns = document.querySelectorAll('.nature-feed-btn');
+      btns.forEach(b => {
+        b.className = 'nature-feed-btn px-2 py-1.5 rounded-lg text-left text-xs transition-all flex items-center gap-1.5 border bg-blue-950/70 hover:bg-blue-900/80 text-sky-200/90 border-blue-800/40';
+      });
+      const activeBtn = document.getElementById(`feed-btn-${feedKey}`);
+      if (activeBtn) {
+        activeBtn.className = 'nature-feed-btn px-2 py-1.5 rounded-lg text-left text-xs transition-all flex items-center gap-1.5 border bg-gradient-to-r from-blue-600 to-sky-600 text-white font-bold border-sky-300 shadow-md scale-102';
+      }
+
+      // Handle Background Display Layers
+      const iframe = document.getElementById('nature-live-iframe');
+      const videoWrapper = document.getElementById('nature-video-wrapper');
+      const oceanCanvas = document.getElementById('ocean-waves-canvas');
+      const mtnLayer = document.getElementById('mountain-svg-layer');
+
+      if (feedKey === 'mountain') {
+        videoWrapper.classList.add('hidden');
+        oceanCanvas.classList.add('hidden');
+        mtnLayer.classList.remove('hidden');
+        document.getElementById('nature-audio-btn').classList.add('hidden');
+      } else {
+        document.getElementById('nature-audio-btn').classList.remove('hidden');
+        mtnLayer.classList.add('hidden');
+
+        if (data.id) {
+          videoWrapper.classList.remove('hidden');
+          const muteParam = isNatureMuted ? '1' : '0';
+          iframe.src = `https://www.youtube-nocookie.com/embed/${data.id}?autoplay=1&mute=${muteParam}&controls=0&loop=1&playlist=${data.id}&playsinline=1&modestbranding=1&rel=0`;
+        } else {
+          videoWrapper.classList.add('hidden');
+        }
+
+        if (feedKey === 'ocean') {
+          oceanCanvas.classList.remove('hidden');
+          startOceanWavesEngine();
+        } else {
+          oceanCanvas.classList.add('hidden');
+        }
+      }
+    }
+
+    function toggleNatureAudio() {
+      isNatureMuted = !isNatureMuted;
+      const btn = document.getElementById('nature-audio-btn');
+      btn.innerText = isNatureMuted ? '🔇 Muted' : '🔊 Live Audio';
+      btn.className = !isNatureMuted 
+        ? 'px-2 py-1 rounded text-[11px] font-mono font-semibold transition-all border bg-emerald-600 text-white border-emerald-400'
+        : 'px-2 py-1 rounded text-[11px] font-mono font-semibold transition-all border bg-blue-900/60 hover:bg-blue-800 text-sky-300 border-blue-700/50';
+
+      const iframe = document.getElementById('nature-live-iframe');
+      const data = NATURE_FEEDS_DATA[currentNatureFeed];
+      if (iframe && data && data.id) {
+        const muteParam = isNatureMuted ? '1' : '0';
+        iframe.src = `https://www.youtube-nocookie.com/embed/${data.id}?autoplay=1&mute=${muteParam}&controls=0&loop=1&playlist=${data.id}&playsinline=1&modestbranding=1&rel=0`;
+      }
+    }
+
+    function toggleCinemaMode() {
+      isCinemaMode = !isCinemaMode;
+      const main = document.querySelector('main');
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      const banner = document.getElementById('cinema-banner');
+      const vignette = document.getElementById('nature-vignette');
+      const cinemaBtn = document.getElementById('cinema-btn');
+
+      if (isCinemaMode) {
+        if (main) main.className = 'relative z-10 max-w-6xl mx-auto px-4 mt-6 space-y-20 opacity-15 blur-[1px] pointer-events-none select-none scale-[0.98] transition-all duration-700';
+        if (header) header.classList.add('opacity-20');
+        if (footer) footer.classList.add('opacity-20');
+        if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
+        if (vignette) vignette.className = 'absolute inset-0 bg-slate-950/20 backdrop-blur-none transition-opacity duration-700 pointer-events-none';
+        if (cinemaBtn) {
+          cinemaBtn.innerHTML = '<span>👁️ Back</span>';
+          cinemaBtn.className = 'px-2 py-1 rounded text-[11px] font-mono font-semibold transition-all flex items-center gap-1 border bg-amber-400 text-amber-950 border-amber-300 shadow-md scale-105';
+        }
+      } else {
+        if (main) main.className = 'relative z-10 max-w-6xl mx-auto px-4 mt-6 space-y-20 opacity-100 scale-100 transition-all duration-700';
+        if (header) header.classList.remove('opacity-20');
+        if (footer) footer.classList.remove('opacity-20');
+        if (banner) { banner.classList.add('hidden'); banner.classList.remove('flex'); }
+        if (vignette) vignette.className = 'absolute inset-0 bg-gradient-to-b from-[#030914]/85 via-[#061830]/75 to-[#040e1f]/90 transition-opacity duration-700 pointer-events-none';
+        if (cinemaBtn) {
+          cinemaBtn.innerHTML = '<span>🎥 Focus</span>';
+          cinemaBtn.className = 'px-2 py-1 rounded text-[11px] font-mono font-semibold transition-all flex items-center gap-1 border bg-blue-900/60 hover:bg-blue-800 text-sky-200 border-blue-700/50';
+        }
+      }
+    }
+
+    function toggleNatureCtrlMin() {
+      isNatureCtrlExpanded = !isNatureCtrlExpanded;
+      const opts = document.getElementById('nature-feed-options');
+      const arrow = document.getElementById('nature-ctrl-arrow');
+      if (isNatureCtrlExpanded) {
+        opts.classList.remove('hidden');
+        arrow.innerText = '▼';
+      } else {
+        opts.classList.add('hidden');
+        arrow.innerText = '▲';
+      }
+    }
+
+    // --- 6. MOVABLE INTERACTIVE OCEAN WAVES CANVAS PHYSICS ---
+    let oceanCanvasRunning = false;
+    let oceanAnimId = null;
+    const oceanMouse = { x: -1000, y: -1000, vx: 0, vy: 0, isHovering: false };
+
+    window.addEventListener('mousemove', (e) => {
+      const prevX = oceanMouse.x;
+      const prevY = oceanMouse.y;
+      oceanMouse.x = e.clientX;
+      oceanMouse.y = e.clientY;
+      oceanMouse.vx = e.clientX - prevX;
+      oceanMouse.vy = e.clientY - prevY;
+      oceanMouse.isHovering = true;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      oceanMouse.isHovering = false;
+    });
+
+    function startOceanWavesEngine() {
+      if (oceanCanvasRunning) return;
+      oceanCanvasRunning = true;
+
+      const canvas = document.getElementById('ocean-waves-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        if (!canvas) return;
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      let step = 0;
+
+      const render = () => {
+        if (currentNatureFeed !== 'ocean') {
+          oceanCanvasRunning = false;
+          return;
+        }
+
+        step += 0.018;
+        ctx.clearRect(0, 0, width, height);
+
+        // Deep Oceanic Water Gradient
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, 'rgba(3, 15, 38, 0.95)');
+        grad.addColorStop(0.5, 'rgba(5, 29, 64, 0.92)');
+        grad.addColorStop(1, 'rgba(2, 12, 28, 0.98)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        // Multiple Wave Harmonic Layers
+        const waveLayers = [
+          { yBase: height * 0.45, amp: 26, freq: 0.0035, speed: 1.0, color: 'rgba(14, 116, 144, 0.28)' },
+          { yBase: height * 0.58, amp: 35, freq: 0.0028, speed: 0.8, color: 'rgba(2, 132, 199, 0.35)' },
+          { yBase: height * 0.72, amp: 45, freq: 0.0022, speed: 1.3, color: 'rgba(3, 105, 161, 0.45)' },
+          { yBase: height * 0.86, amp: 55, freq: 0.0018, speed: 0.9, color: 'rgba(8, 47, 73, 0.75)' },
+        ];
+
+        waveLayers.forEach((w, layerIdx) => {
+          ctx.beginPath();
+          ctx.moveTo(0, height);
+
+          for (let x = 0; x <= width; x += 6) {
+            let waveY = w.yBase + Math.sin(x * w.freq + step * w.speed) * w.amp + Math.cos(x * w.freq * 1.5 - step * 0.7) * (w.amp * 0.35);
+
+            // Cursor wave swell: mouse dynamically stirs the water
+            if (oceanMouse.isHovering) {
+              const dx = x - oceanMouse.x;
+              const dist = Math.abs(dx);
+              if (dist < 260) {
+                const influence = Math.cos((dist / 260) * (Math.PI / 2));
+                const ripple = Math.sin(dist * 0.05 - step * 3) * 22;
+                waveY += (influence * ripple + (oceanMouse.vy * 0.2)) * (0.8 + layerIdx * 0.2);
+              }
+            }
+
+            if (x === 0) ctx.lineTo(0, waveY);
+            else ctx.lineTo(x, waveY);
+          }
+
+          ctx.lineTo(width, height);
+          ctx.closePath();
+          ctx.fillStyle = w.color;
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(186, 230, 253, 0.22)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        });
+
+        // Bioluminescent sea sparkle particles
+        for (let i = 0; i < 20; i++) {
+          const sx = (Math.sin(i * 99 + step * 0.3) * 0.5 + 0.5) * width;
+          const sy = (Math.cos(i * 33 + step * 0.4) * 0.3 + 0.6) * height;
+          const radius = Math.sin(step * 2 + i) * 1.5 + 2;
+          ctx.beginPath();
+          ctx.arc(sx, sy, Math.max(0.5, radius), 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(125, 211, 252, 0.45)';
+          ctx.fill();
+        }
+
+        oceanAnimId = requestAnimationFrame(render);
+      };
+
+      render();
+    }
+
+    // --- 7. INTERACTIVE NATURE & STARDUST CURSOR ENGINE ---
+    (function initInteractiveCursor() {
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      const canvas = document.getElementById('cursor-sparkles-canvas');
+      if (!dot || !ring || !canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const mouse = { x: -100, y: -100 };
+      const ringPos = { x: -100, y: -100 };
+      const sparkles = [];
+      let isVisible = false;
+      let isHovering = false;
+      let isClicking = false;
+      let hoverType = null;
+
+      const colors = [
+        'rgba(56, 189, 248, ',  // Cyan
+        'rgba(125, 211, 252, ', // Sky blue
+        'rgba(253, 224, 71, ',  // Warm Amber
+        'rgba(147, 197, 253, ', // Ice blue
+      ];
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+
+        if (!isVisible) {
+          isVisible = true;
+          dot.classList.remove('opacity-0');
+          ring.classList.remove('opacity-0');
+        }
+
+        // Add trail sparkles
+        if (Math.random() < 0.6) {
+          sparkles.push({
+            x: e.clientX + (Math.random() * 8 - 4),
+            y: e.clientY + (Math.random() * 8 - 4),
+            vx: Math.random() * 1.5 - 0.75,
+            vy: Math.random() * -1.2 - 0.3,
+            size: Math.random() * 2.5 + 1.5,
+            alpha: 0.9,
+            color: colors[Math.floor(Math.random() * colors.length)],
+          });
+          if (sparkles.length > 35) sparkles.shift();
+        }
+
+        // Detect hover over interactive elements
+        const target = e.target;
+        if (target) {
+          const clickable = target.closest('a, button, input, textarea, select, [role="button"], .sticky-card, .nature-feed-btn');
+          if (clickable) {
+            isHovering = true;
+            if (clickable.classList.contains('sticky-card')) {
+              hoverType = 'note';
+              ring.innerHTML = '<span class="text-[10px] select-none pointer-events-none">📌</span>';
+            } else if (clickable.tagName === 'A') {
+              hoverType = 'link';
+              ring.innerHTML = '<span class="text-[10px] select-none pointer-events-none">✨</span>';
+            } else {
+              hoverType = 'clickable';
+              ring.innerHTML = '';
+            }
+
+            ring.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-all duration-200 ease-out flex items-center justify-center opacity-100 w-12 h-12 border-2 border-amber-300 bg-amber-400/20 shadow-[0_0_20px_rgba(251,191,36,0.6)] scale-110';
+            dot.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-opacity duration-150 opacity-100 w-2.5 h-2.5 bg-amber-300 shadow-[0_0_8px_#fde047]';
+          } else {
+            isHovering = false;
+            hoverType = null;
+            ring.innerHTML = '';
+            ring.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-all duration-200 ease-out flex items-center justify-center opacity-100 w-9 h-9 border border-sky-400/60 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.35)]';
+            dot.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-opacity duration-150 opacity-100 w-2 h-2 bg-sky-400 shadow-[0_0_6px_#38bdf8]';
+          }
+        }
+      });
+
+      window.addEventListener('mousedown', (e) => {
+        isClicking = true;
+        ring.classList.add('scale-90');
+        dot.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-opacity duration-150 opacity-100 w-3 h-3 bg-white shadow-[0_0_10px_#ffffff]';
+
+        // Click shockwave ripple
+        const ripple = document.createElement('div');
+        ripple.className = 'pointer-events-none fixed z-50 rounded-full border-2 border-sky-400/80 animate-ping';
+        ripple.style.left = e.clientX + 'px';
+        ripple.style.top = e.clientY + 'px';
+        ripple.style.width = '38px';
+        ripple.style.height = '38px';
+        ripple.style.transform = 'translate(-50%, -50%)';
+        ripple.style.animationDuration = '550ms';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+
+        // Click sparkle burst
+        for (let i = 0; i < 8; i++) {
+          const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.2;
+          const speed = Math.random() * 2.5 + 1.5;
+          sparkles.push({
+            x: e.clientX,
+            y: e.clientY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: Math.random() * 3 + 2,
+            alpha: 1.0,
+            color: 'rgba(56, 189, 248, ',
+          });
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        isClicking = false;
+        if (!isHovering) {
+          ring.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-all duration-200 ease-out flex items-center justify-center opacity-100 w-9 h-9 border border-sky-400/60 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.35)]';
+          dot.className = 'pointer-events-none fixed top-0 left-0 z-50 rounded-full transition-opacity duration-150 opacity-100 w-2 h-2 bg-sky-400 shadow-[0_0_6px_#38bdf8]';
+        }
+      });
+
+      document.addEventListener('mouseleave', () => {
+        isVisible = false;
+        dot.classList.add('opacity-0');
+        ring.classList.add('opacity-0');
+      });
+
+      document.addEventListener('mouseenter', () => {
+        isVisible = true;
+        dot.classList.remove('opacity-0');
+        ring.classList.remove('opacity-0');
+      });
+
+      function loop() {
+        // Smooth LERP ring follow
+        ringPos.x += (mouse.x - ringPos.x) * 0.18;
+        ringPos.y += (mouse.y - ringPos.y) * 0.18;
+
+        dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%)`;
+        ring.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0) translate(-50%, -50%)`;
+
+        // Draw particle sparkles
+        ctx.clearRect(0, 0, width, height);
+        for (let i = sparkles.length - 1; i >= 0; i--) {
+          const s = sparkles[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.alpha -= 0.025;
+          s.size *= 0.96;
+
+          if (s.alpha <= 0 || s.size <= 0.3) {
+            sparkles.splice(i, 1);
+            continue;
+          }
+
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fillStyle = `${s.color}${s.alpha})`;
+          ctx.fill();
+        }
+
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+
+    // Initialize default Leaderboard and ensure Mountain Background is active
+    initLeaderboard();
+    setNatureFeed('mountain');
+  </script>
+</body>
+</html>

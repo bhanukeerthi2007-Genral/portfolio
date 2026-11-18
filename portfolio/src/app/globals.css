@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@300;400;500;600;700&family=Kalam:wght@400;700&display=swap');
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-handwriting: 'Caveat', 'Kalam', cursive;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #0d2015;
+  color: #1a2e22;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom Forest & Nature Ambience */
+.nature-bg {
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(52, 98, 71, 0.45) 0%, transparent 40%),
+    radial-gradient(circle at 85% 60%, rgba(45, 90, 63, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(20, 47, 33, 0.8) 0%, transparent 50%),
+    linear-gradient(180deg, #091a10 0%, #102619 35%, #142f21 70%, #0c1d12 100%);
+  background-attachment: fixed;
+}
+
+/* Subtle organic grain overlay */
+.nature-overlay {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Realistic Sticky Note Paper Shadows */
+.sticky-shadow {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 8px 24px -4px rgba(0, 0, 0, 0.35),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sticky-shadow:hover {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 18px 36px -6px rgba(0, 0, 0, 0.45),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.02);
+  transform: translateY(-6px) scale(1.015) rotate(0deg) !important;
+  z-index: 20;
+}
+
+/* Push Pin Elements */
+.pin-head {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.45), inset 0 2px 2px rgba(255,255,255,0.7);
+  position: relative;
+}
+
+.pin-head::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+}
+
+/* Washi Tape Strip */
+.washi-tape {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  border-left: 2px dashed rgba(200, 200, 200, 0.5);
+  border-right: 2px dashed rgba(200, 200, 200, 0.5);
+}
+
+/* Paper Clip */
+.paper-clip {
+  width: 14px;
+  height: 38px;
+  border: 3px solid #8c9ba5;
+  border-radius: 12px;
+  position: absolute;
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0d2015;
+}
+::-webkit-scrollbar-thumb {
+  background: #346247;
+  border-radius: 5px;
+  border: 2px solid #0d2015;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a7c59;
+}
